@@ -1,0 +1,15 @@
+redis:
+  host: localhost
+  port: 6379
+  password: your_redis_password
+
+llm:
+  url: https://api.siliconflow.cn/v1/chat/completions
+  apikey: sk-nlqshhsvilvpqylmwgrgiamkjxylrkboshinyzrbqmcafabq
+
+mysql:
+  host: localhost
+  port: 3306
+  user: root
+  password: root123489+
+  database: raftsim

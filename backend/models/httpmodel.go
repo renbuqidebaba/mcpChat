@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/spf13/viper"
 )
 
 func HttpRequest(method, url string, data interface{}) *http.Response {
@@ -25,7 +27,7 @@ func HttpRequest(method, url string, data interface{}) *http.Response {
 		}
 	}
 	// Set headers
-	req.Header.Set("Authorization", "Bearer sk-nlqshhsvilvpqylmwgrgiamkjxylrkboshinyzrbqmcafabq")
+	req.Header.Set("Authorization", "Bearer "+viper.GetString("llm.api_key"))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {

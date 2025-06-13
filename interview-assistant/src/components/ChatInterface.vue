@@ -59,8 +59,13 @@ export default {
         }
       ],
       userInput: '',
-      loading: false
+      loading: false,
+      currentUser: ''
     };
+  },
+  mounted() {
+    this.currentUser = localStorage.getItem('currentUser') || '';
+    this.$refs.inputField.focus();
   },
   methods: {
     async sendMessage() {
@@ -77,8 +82,8 @@ export default {
       this.scrollToBottom();
       
       try {
-        // 调用后端API
-        const response = await sendChatMessage(userMessage);
+        // 调用后端API，传入用户名和消息
+        const response = await sendChatMessage(this.currentUser, userMessage);
         if (response.code === 200 || response.code === 0) {
           this.messages.push({
             role: 'assistant',
@@ -116,10 +121,6 @@ export default {
         container.scrollTop = container.scrollHeight;
       });
     }
-  },
-  mounted() {
-    // 初始聚焦到输入框
-    this.$refs.inputField.focus();
   }
 };
 </script>

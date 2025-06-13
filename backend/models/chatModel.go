@@ -2,7 +2,12 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type ChatRequest struct {
@@ -27,7 +32,7 @@ type Msg struct {
 }
 
 func SentChat(question string) string {
-	url := "https://api.siliconflow.cn/v1/chat/completions"
+	url := viper.GetString("llm.url")
 	// Request payload
 	payload := map[string]interface{}{
 		"model": "Pro/deepseek-ai/DeepSeek-V3-1226",
@@ -38,22 +43,50 @@ func SentChat(question string) string {
 			},
 		},
 		"temperature": 0.7,
-		// "tools": []map[string]interface{}{
-		// 	{
-		// 		"type": "function",
-		// 		"function": map[string]interface{}{
-		// 			"description": "<string>",
-		// 			"name":        "<string>",
-		// 			"parameters":  map[string]interface{}{},
-		// 			"strict":      false,
-		// 		},
-		// 	},
-		// },
 	}
 	resp := HttpRequest("POST", url, payload)
 	var chatresq ChatResponse
-	// Handle response
 	body, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(body, &chatresq)
 	return chatresq.Choice[0].Message.Content
+}
+
+func Getsome() {
+	url := "https://api.openai-hub.com/v1/messages"
+	method := "POST"
+
+	payload := strings.NewReader(`{` + "\n" +
+		`  "model": "claude-3-5-sonnet-20240620",` + "\n" +
+		`  "max_tokens": 1024,` + "\n" +
+		`  "messages": [` + "\n" +
+		`    {` + "\n" +
+		`      "role": "user",` + "\n" +
+		`      "content": "Hello, world"` + "\n" +
+		`    }` + "\n" +
+		`  ]` + "\n" +
+		`}`)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.Header.Add("Authorization", "Bearer sk-wDvoBfnSp5MRnMvt2MqzWUyQS01II2YmaovleZbQzUbBSDoe")
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(body))
 }
